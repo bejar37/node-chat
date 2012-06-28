@@ -1,8 +1,9 @@
 var http = require('http');
 var qs = require('qs');
 
+var msgs = [];
 var s  = http.createServer(function(req, res) {
-  var msgs = [];
+  console.log('request starting: '+ req.method);
   var content = '';
   var gen_messages = function(msgs){
     var body = '<html>'+
@@ -13,15 +14,17 @@ var s  = http.createServer(function(req, res) {
       '<body>'+
       '<form action="/" method="post" name="msg">'+
       '<input name="from" placeholder="Name" id="name"/>'+
-      '<input name="message" placeholder="Message" id="message"/>'+
-      '<button type="submit" id="submit">Send</button>';
+      '<input name="text" placeholder="Message" id="message"/>'+
+      '<button type="submit" id="submit">Send</button>'+ '</form>' +
+      '<ul>';
+
     for (var i = 0; i<msgs.length; i++){
-      body += '<div class="sender_name">' + msgs[i].from + '</div>';
-      body += '<div class="chat_message">' + msgs[i].text + '</div>';
+      body += '<li>';
+      body += '<span class="sender_name">From: ' + msgs[i].from + '</span> ';
+      body += '<span class="chat_message">Message: ' + msgs[i].text + '</span> ';
+      body += '</li>';
     }
-    body +='</form>'+
-      '</body>'+
-      '</html>';
+    body += '</ul>' + '</body>'+ '</html>';
 
     return body;
   };
@@ -30,15 +33,12 @@ var s  = http.createServer(function(req, res) {
   if (req.method == 'POST') {
     req.on('data', function(data) {
       content += data;
-      console.log(data);
     });
 
     req.on('end', function() {
-      console.log('Body: ' + req.body);
-      console.log('Content: ' + content);
-      req.body = JSON.parse(content);
-      msgs.push(req.body.msg);
-      console.log(content);
+      req.body = qs.parse(content);
+      var msg = { from: req.body.from, text: req.body.text };
+      msgs.push(msg);
     });
 
   }
