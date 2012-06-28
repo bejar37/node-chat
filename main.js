@@ -1,9 +1,8 @@
 $(document).on('ready', function(){
 
 	$("#send").on('click', function(){
-			$.ajax({
+			$.post({
 				url: window.location.hostname + ':8000',
-				type: 'POST',
 				dataType: 'json',
 				data: {
 
@@ -21,4 +20,3 @@ $(document).on('ready', function(){
 
 
 
-};
